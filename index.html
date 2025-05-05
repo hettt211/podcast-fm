@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap'); /* 引入现代字体 */
+
+        :root {
+            --primary-color: #8e44ad; /* 主题色 - 紫色 */
+            --primary-light: #a569bd; /* 浅紫色 */
+            --primary-dark: #703688; /* 深紫色 */
+            --secondary-color: #9b59b6; /* 次要色 - 淡紫色 */
+            --background-color: #f5f5f7; /* 背景色 - 浅灰偏白 */
+            --surface-color: #ffffff; /* 元素表面色 - 白色 */
+            --text-color: #333333; /* 主要文本色 - 深灰 */
+            --text-muted-color: #777777; /* 次要文本色 - 灰色 */
+            --border-color: #e0e0e0; /* 边框色 - 浅灰 */
+            --hover-bg-color: #f0f0f2; /* 悬停背景色 */
+            --button-hover-bg: #7d3c98; /* 按钮悬停背景色 */
+            --box-shadow: 0 4px 20px rgba(142, 68, 173, 0.1); /* 紫色调阴影 */
+            --border-radius: 12px; /* 更大的圆角 */
+            --transition-speed: 0.3s; /* 统一过渡动画速度 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* 应用新字体 */
+            margin: 0;
+            padding: 0; /* 移除页面边距 */
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 100%;
+            margin: auto;
+            background: var(--surface-color);
+            padding: 20px; /* 减少容器内边距 */
+            border-radius: 0; /* 移除顶部圆角 */
+            box-shadow: var(--box-shadow);
+        }
+        
+        /* 顶部问候栏样式 */
+        .greeting-bar {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin: -20px -20px 20px -20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .greeting-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .current-time {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* 播放器样式 */
+        .player-container {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            border-radius: var(--border-radius);
+            padding: 25px 20px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(142, 68, 173, 0.2);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        
+        .player-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(142, 68, 173, 0.25);
+        }
+        .player-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://source.unsplash.com/random/800x400/?music') center/cover no-repeat;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        .player-content {
+            position: relative;
+            z-index: 1;
+        }
+        .now-playing {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .podcast-cover {
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            display: block;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background-color: rgba(255, 255, 255, 0.1);
+            background-size: cover;
+            background-position: center;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .podcast-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none;
+        }
+        
+        .podcast-cover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+        }
+        .player-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .player-author {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .control-button.play-pause {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .control-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .control-button.play-pause:hover {
+            background: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .control-button:active {
+            transform: scale(0.95);
+        }
+        .progress-container {
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: height 0.2s;
+        }
+        .progress-bar:hover {
+            height: 6px;
+        }
+        .progress-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%; /* 初始进度 */
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        
+        /* 滑块选择器样式 */
+        .slider-container {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .slider-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            margin-bottom: 10px;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--primary-dark);
+            box-shadow: 0 0 10px rgba(142, 68, 173, 0.4);
+        }
+        /* 滑块节点标记样式 */
+        .slider-ticks {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            margin-top: -5px;
+        }
+        .slider-tick {
+            position: relative;
+            width: 2px;
+            height: 10px;
+            background: var(--primary-color);
+            opacity: 0.7;
+        }
+        .slider-tick-label {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted-color);
+            white-space: nowrap;
+        }
+        .slider-tick.major {
+            height: 14px;
+            width: 3px;
+            background: var(--primary-color);
+            opacity: 0.9;
+        }
+        .slider-value {
+            text-align: center;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 40px; /* 增加标题下边距 */
+            font-weight: 700;
+        }
+        h2, h3, h4 {
+            color: var(--text-color);
+            margin-top: 0;
+            font-weight: 500;
+        }
+        .module {
+            margin-bottom: 35px; /* 增加模块间距 */
+            padding: 20px; /* 增加模块内边距 */
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--surface-color); /* 模块背景 */
+        }
+        .module {
+            position: relative; /* 为绝对定位的按钮提供容器 */
+        }
+        .module h3 {
+            color: var(--primary-color); /* 模块标题使用主题色 */
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px; /* 增加标题下边距 */
+        }
+        label {
+            display: block;
+            margin-bottom: 8px; /* 增加标签下边距 */
+            font-weight: 500;
+            color: var(--text-muted-color);
+        }
+        input[type="number"] {
+            width: 120px; /* 稍微加宽 */
+            padding: 10px 12px; /* 增加内边距 */
+            margin-bottom: 15px; /* 增加下边距 */
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            box-sizing: border-box; /* 确保 padding 不影响宽度 */
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        button {
+            padding: 10px 20px; /* 调整按钮内边距 */
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            margin-right: 8px;
+            font-size: 0.95rem;
+            transition: all var(--transition-speed);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        /* 次要按钮样式 (例如移除按钮) */
+        button.secondary {
+            background-color: var(--surface-color);
+            color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+        }
+        button.secondary:hover {
+            background-color: var(--hover-bg-color);
+            border-color: var(--secondary-color);
+        }
+
+        #recommendation-result ul, #playlist ul, #recently-listened ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px; /* 列表与上方元素间距 */
+        }
+        #recommendation-result li, #playlist li, #recently-listened li {
+            background: var(--surface-color);
+            margin-bottom: 12px; /* 列表项间距 */
+            padding: 15px; /* 列表项内边距 */
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-speed);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        #recommendation-result li:hover, #playlist li:hover, #recently-listened li:hover {
+            background-color: var(--hover-bg-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary-light);
+        }
+        /* 已经在上面的样式中更新了这部分 */
+        /* 播客封面图片样式 */
+        .podcast-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin-right: 15px;
+            object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+        .podcast-thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .podcast-info {
+            flex-grow: 1;
+            margin-right: 15px; /* 信息与按钮间距 */
+        }
+        .podcast-title {
+            font-weight: 500; /* 调整字重 */
+            color: var(--text-color);
+            display: block; /* 让标题独占一行 */
+            margin-bottom: 4px;
+        }
+        .podcast-duration {
+            color: var(--text-muted-color);
+            font-size: 0.85em;
+        }
+        .listen-progress {
+            font-size: 0.85em;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+        .summary {
+            font-size: 0.8em;
+            color: var(--text-muted-color);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .summary b {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        /* 隐藏推荐确认按钮的初始样式 */
+        #confirm-recommendation {
+             margin-top: 15px; /* 与列表的间距 */
+        }
+        /* 重新生成按钮样式调整 */
+        .refresh-button {
+            position: absolute;
+            top: 15px; /* 调整垂直位置 */
+            right: 20px; /* 调整水平位置 */
+            background-color: transparent;
+            color: var(--text-muted-color);
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            box-shadow: none;
+        }
+        .refresh-button:hover {
+            background-color: var(--hover-bg-color);
+            color: var(--primary-color);
+            border-color: var(--primary-light);
+            transform: none; /* 移除悬停时的位移 */
+            box-shadow: none;
+        }
+        .refresh-button i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部问候栏 -->
+        <div class="greeting-bar">
+            <div class="greeting-text" id="greeting">下午好！选择你的收听时长，开启定制推荐</div>
+            <div class="current-time" id="current-time">15:30</div>
+        </div>
+        
+      <!-- 收听时长滑块 -->
+      <div class="slider-container">
+        <label class="slider-label" for="listen-duration-slider">预计收听时长: <span id="duration-value">60</span> 分钟</label>
+        <input type="range" class="range-slider" id="listen-duration-slider" min="0" max="120" value="60" step="5">
+        <div class="slider-ticks">
+            <div class="slider-tick major"><div class="slider-tick-label">0</div></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick major"><div class="slider-tick-label">30</div></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick major"><div class="slider-tick-label">60</div></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick major"><div class="slider-tick-label">90</div></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick"></div>
+            <div class="slider-tick major"><div class="slider-tick-label">120</div></div>
+        </div>
+    </div>
+
+    <!-- 开启推荐按钮 -->
+    <div style="text-align: center; margin-bottom: 25px;">
+        <button id="start-recommendation-button" onclick="getRecommendations(true)">开启推荐</button>
+    </div>
+
+    <!-- 个性化推荐模块 -->
+    <div class="module">
+        <h3>随心听FM <i class="fas fa-magic"></i></h3>
+        <button onclick="getRecommendations()" class="refresh-button"><i class="fas fa-sync-alt"></i> 重新生成</button>
+        
+        <div id="recommendation-result">
+            <ul>
+                <!-- 推荐结果将显示在这里 -->
+            </ul>
+            <button onclick="addToPlaylist()" style="display: none;" id="confirm-recommendation">加入待播</button>
+        </div>
+    </div>
+
+        
+       
+
+    <script>
+        // 获取播客封面图片路径
+        function getPodcastCoverPath(author) {
+            // 根据作者名称获取对应的图片路径
+            // 如果找不到匹配的图片，则返回默认图片
+            const defaultCover = 'https://via.placeholder.com/60x60/8e44ad/ffffff?text=' + encodeURIComponent(author.charAt(0));
+            
+            // 检查是否有对应的图片
+            const authorImgMap = {
+                '李诞': 'image/李诞.jpg',
+                '声动早咖啡': 'image/声动早咖啡.jpg',
+                '商业就是这样': 'image/商业就是这样.jpg',
+                '天真不天真': 'image/天真不天真.jpg',
+                '生活杂志': 'image/生活杂志.jpg',
+                '原来是这样？！': 'image/原来是这样？！.jpg',
+                '地理狗看世界': 'image/地理狗看世界.jpg',
+                '文化有限': 'image/文化有限.jpg',
+                '知行小酒馆': 'image/知行小酒馆.jpg',
+                '36氪·8点1氪': 'image/8点1氪.jpg'
+            };
+            
+            return authorImgMap[author] || defaultCover;
+        }
+        
+        // 模拟播客数据
+        const allPodcasts = [
+            { id: 1, author:"李诞", title: "20.违心时刻", duration: 43, description: "你的关注" },
+            { id: 2, author:"博物志", title: "235.扬州观想（上）", duration: 98, description: "你的关注" },
+            { id: 3, author:"声动早咖啡", title: "情绪劳动成职场隐形KPI，打工人怎样才能减少内耗？", duration: 16, description: "今日更新" },
+            { id: 4, author:"歪波音乐室", title: "4月新歌推荐 | 陶喆、黄宣、Lorde、打雷姐…初夏来临！", duration: 81, description: "你的关注" },
+            { id: 5, author:"张小珺", title: "对Manus创始人肖弘的3小时访谈：世界不是线性外推，做博弈中的重要变量", duration: 202, description: "近期热门" },
+            { id: 6, author:"商业就是这样", title: "商业小样25 | 一次性搞懂AUDI和奥迪的关系", duration: 12, description: "今日更新" },
+            { id: 7, author:"奇想驿", title: "在flomo 5周年时，聊聊那些真实的思考痕迹", duration: 27, description: "你的关注" },
+            { id: 8, author:"随机波动", title: "【随机波动158】与严艺家聊《混沌少年时》：当男孩杀人，当师姐发疯", duration: 87, description: "精近期热门" },
+            { id: 9, author:"天真不天真", title: "vol.26 我的新进化：在运动中找回生命主体性", duration: 68, description: "近期热门" },
+            { id: 10, author:"不把天聊si", title: "vol.197 | 逐渐变老的生活里，如何创造年轻感？", duration: 47, description: "今日更新" },
+            { id: 11, author:"喜番调频|笑个不停", title: "我的高光（中光、低光、微光）时刻", duration: 81, description: "笑话脱口秀" },
+            { id: 12, author:"给女孩的商业第一课", title: "【润宇返场】怒聊4小时！教会女孩如何启动小生意", duration: 179, description: "你的关注" },
+            { id: 13, author:"看理想圆桌", title: "观鸟做饭写日记，在一个不守承诺的世界自我托举", duration: 76, description: "你的关注" },
+            { id: 14, author:"生活杂志", title: "腐竹，热量比猪大肠还高！很多人却还在把它当减脂餐", duration: 8, description: "生活杂谈" },
+            { id: 15, author:"电影不无聊", title: "vol.501 2025年5月观影指南", duration: 73, description: "今日更新" },
+            { id: 16, author:"行动派精选文章", title: "高配人生，不是“拼出来”的", duration: 12, description: "个人成长" },
+            { id: 17, author:"知行小酒馆", title: "E184 当关税站改变世界：我们要怎样理解未来的生活、投资以及经济秩序？", duration: 78, description: "近期热门" },
+            { id: 18, author:"原来是这样？！", title: "我们为什么会哺乳？", duration: 50, description: "科学通识" },
+            { id: 19, author:"地理狗看世界", title: "济州岛，苦尽甘柑来", duration: 9, description: "世界风情" },
+            { id: 20, author:"文化有限", title: "夏洛的网：总会有人为你写下“你很棒”", duration: 96, description: "近期热门" },
+            { id: 21, author:"36氪·8点1氪", title: "一季度全国黄金消费量290.492吨", duration: 3, description: "今日更新" },
+            { id: 22, author:"商业就是这样", title: "vol.205 我们研究了奥乐齐中国所有的商品，它到底便宜吗", duration: 45, description: "你的关注" }
+        ];
+
+    
+
+        let currentRecommendation = [];
+        let playlist = [];
+
+        // 获取推荐组合
+        function getRecommendations() {
+            const targetDuration = parseInt(document.getElementById('duration-value').textContent);
+            const resultList = document.getElementById('recommendation-result').querySelector('ul');
+            const confirmButton = document.getElementById('confirm-recommendation');
+            resultList.innerHTML = ''; // 清空旧推荐
+            currentRecommendation = [];
+            
+            // 添加加载动画
+            resultList.innerHTML = '<li style="justify-content: center;"><i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> 正在为您推荐...</li>';
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                resultList.innerHTML = '';
+                
+                if (isNaN(targetDuration) || targetDuration <= 0) {
+                    resultList.innerHTML = '<li>请输入有效的时长。</li>';
+                    confirmButton.style.display = 'none';
+                    return;
+                }
+
+            // 简单的推荐逻辑：找到时长最接近的单个或两个节目组合
+            // 优先单个节目
+            let bestSingleMatch = null;
+            let minSingleDiff = Infinity;
+
+            allPodcasts.forEach(p => {
+                const diff = Math.abs(p.duration - targetDuration);
+                if (diff < minSingleDiff) {
+                    minSingleDiff = diff;
+                    bestSingleMatch = p;
+                }
+            });
+
+            // 尝试两个节目组合
+            let bestPairMatch = [];
+            let minPairDiff = Infinity;
+
+            for (let i = 0; i < allPodcasts.length; i++) {
+                for (let j = i + 1; j < allPodcasts.length; j++) {
+                    const pairDuration = allPodcasts[i].duration + allPodcasts[j].duration;
+                    const diff = Math.abs(pairDuration - targetDuration);
+                    if (diff < minPairDiff) {
+                        minPairDiff = diff;
+                        bestPairMatch = [allPodcasts[i], allPodcasts[j]];
+                    }
+                }
+            }
+
+            // 比较单节目和双节目组合哪个更优 (优先时长更接近的)
+            if (bestSingleMatch && minSingleDiff <= minPairDiff + 5) { // 给单节目一点容忍度
+                 currentRecommendation = [bestSingleMatch];
+            } else if (bestPairMatch.length > 0) {
+                 currentRecommendation = bestPairMatch;
+            }
+
+            if (currentRecommendation.length > 0) {
+                currentRecommendation.forEach(podcast => {
+                    const li = document.createElement('li');
+                    // 获取播客封面图片路径
+                    const coverPath = getPodcastCoverPath(podcast.author);
+                    li.innerHTML = `
+                        <img src="${coverPath}" alt="${podcast.author}" class="podcast-thumbnail">
+                        <div class="podcast-info">
+                            <span class="podcast-title">${podcast.title}</span>
+                            <span class="podcast-duration">(${podcast.duration} 分钟)</span>
+                            <div class="summary" style="margin-top: 5px;">${podcast.description}</div>
+                        </div>
+                    `;
+                    // 添加点击播放功能
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', () => playPodcast(podcast));
+                    resultList.appendChild(li);
+                });
+                confirmButton.style.display = 'inline-block';
+                
+                // 显示总时长
+                const totalDuration = currentRecommendation.reduce((sum, podcast) => sum + podcast.duration, 0);
+                const durationDiff = Math.abs(totalDuration - targetDuration);
+                let matchText = '';
+                
+                if (durationDiff <= 5) {
+                    matchText = `<span style="color: #4CAF50;">✓ 完美匹配您的时长需求</span>`;
+                } else if (durationDiff <= 15) {
+                    matchText = `<span style="color: #FF9800;">接近您的时长需求</span>`;
+                } else {
+                    matchText = `<span style="color: #F44336;">与您的时长需求相差 ${durationDiff} 分钟</span>`;
+                }
+                
+                const summaryLi = document.createElement('li');
+                summaryLi.style.backgroundColor = 'rgba(142, 68, 173, 0.05)';
+                summaryLi.style.borderLeft = '3px solid var(--primary-color)';
+                summaryLi.innerHTML = `
+                    <div style="width: 100%; text-align: center;">
+                        <div>总时长: <b>${totalDuration}</b> 分钟</div>
+                        <div style="font-size: 0.85rem; margin-top: 5px;">${matchText}</div>
+                    </div>
+                `;
+                resultList.appendChild(summaryLi);
+                
+            } else {
+                resultList.innerHTML = '<li>未能找到合适的播客推荐。</li>';
+                confirmButton.style.display = 'none';
+            }
+            }, 800); // 模拟延迟结束
+        }
+
+        // 加入待播列表
+        function addToPlaylist() {
+            if (currentRecommendation.length > 0) {
+                playlist.push(...currentRecommendation);
+                renderPlaylist();
+                // 清空推荐区并隐藏确认按钮
+                document.getElementById('recommendation-result').querySelector('ul').innerHTML = '';
+                document.getElementById('confirm-recommendation').style.display = 'none';
+                currentRecommendation = [];
+            }
+        }
+        
+        // 渲染播放列表
+        function renderPlaylist() {
+            const playlistContainer = document.getElementById('playlist');
+            if (!playlistContainer) {
+                // 如果播放列表容器不存在，创建一个
+                const moduleDiv = document.createElement('div');
+                moduleDiv.className = 'module';
+                moduleDiv.innerHTML = `
+                    <h3>待播列表 <i class="fas fa-headphones"></i></h3>
+                    <div id="playlist">
+                        <ul></ul>
+                    </div>
+                `;
+                document.querySelector('.container').appendChild(moduleDiv);
+            }
+            
+            const playlistElement = document.getElementById('playlist') || playlistContainer;
+            const playlistUl = playlistElement.querySelector('ul');
+            playlistUl.innerHTML = '';
+            
+            if (playlist.length === 0) {
+                playlistUl.innerHTML = '<li style="justify-content: center; color: var(--text-muted-color);">待播列表为空，请添加播客</li>';
+                return;
+            }
+            
+            playlist.forEach((podcast, index) => {
+                const li = document.createElement('li');
+                // 获取播客封面图片路径
+                const coverPath = getPodcastCoverPath(podcast.author);
+                li.innerHTML = `
+                    <img src="${coverPath}" alt="${podcast.author}" class="podcast-thumbnail">
+                    <div class="podcast-info">
+                        <span class="podcast-title">${podcast.title}</span>
+                        <span class="podcast-duration">(${podcast.duration} 分钟)</span>
+                        <div class="summary" style="margin-top: 5px;">${podcast.description}</div>
+                    </div>
+                    <div>
+                        <button class="control-button play-pause" style="margin-right: 10px;" onclick="event.stopPropagation(); playPodcast(playlist[${index}]);"><i class="fas fa-play"></i></button>
+                        <button class="secondary" onclick="event.stopPropagation(); removeFromPlaylist(${index})"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+                // 添加点击播放功能
+                li.style.cursor = 'pointer';
+                li.addEventListener('click', () => playPodcast(podcast));
+                playlistUl.appendChild(li);
+            });
+            
+            // 显示总时长
+            const totalDuration = playlist.reduce((sum, podcast) => sum + podcast.duration, 0);
+            const summaryLi = document.createElement('li');
+            summaryLi.style.backgroundColor = 'rgba(142, 68, 173, 0.05)';
+            summaryLi.style.borderLeft = '3px solid var(--primary-color)';
+            summaryLi.innerHTML = `
+                <div style="width: 100%; text-align: center;">
+                    <div>总时长: <b>${totalDuration}</b> 分钟</div>
+                </div>
+            `;
+            playlistUl.appendChild(summaryLi);
+        }
+        
+        // 从播放列表中移除
+        function removeFromPlaylist(index) {
+            playlist.splice(index, 1);
+            renderPlaylist();
+        }
+
+       
+
+        // 播放播客
+        function playPodcast(podcast) {
+            // 创建播放器容器（如果不存在）
+            if (!document.querySelector('.player-container')) {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player-container';
+                playerDiv.innerHTML = `
+                    <div class="player-content">
+                        <div class="now-playing">
+                            <div class="podcast-cover" id="current-podcast-cover"></div>
+                            <div class="player-title" id="current-podcast-title"></div>
+                            <div class="player-author" id="current-podcast-author"></div>
+                        </div>
+                        <div class="player-controls">
+                            <button class="control-button"><i class="fas fa-step-backward"></i></button>
+                            <button class="control-button play-pause"><i class="fas fa-play"></i></button>
+                            <button class="control-button"><i class="fas fa-step-forward"></i></button>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display">
+                                <span id="current-time">0:00</span>
+                                <span id="total-time">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // 将播放器插入到问候栏下方
+                const greetingBar = document.querySelector('.greeting-bar');
+                greetingBar.parentNode.insertBefore(playerDiv, greetingBar.nextSibling);
+            }
+            
+            // 更新播放器信息
+            document.getElementById('current-podcast-title').textContent = podcast.title;
+            document.getElementById('current-podcast-author').textContent = podcast.author;
+            
+            // 更新播放器封面
+            const coverPath = getPodcastCoverPath(podcast.author);
+            const coverElement = document.getElementById('current-podcast-cover');
+            coverElement.style.backgroundImage = `url('${coverPath}')`;
+            
+            // 更新总时长
+            const minutes = Math.floor(podcast.duration);
+            const seconds = Math.round((podcast.duration - minutes) * 60);
+            document.getElementById('total-time').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            // 模拟播放进度
+            const progressFill = document.querySelector('.progress-fill');
+            progressFill.style.width = '0%';
+            
+            // 切换播放按钮图标
+            const playPauseButton = document.querySelector('.play-pause i');
+            playPauseButton.className = 'fas fa-pause';
+        }
+        
+        // 更新问候语和当前时间
+        function updateGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = "";
+            
+            if (hour >= 5 && hour < 12) {
+                greeting = "早上好";
+            } else if (hour >= 12 && hour < 14) {
+                greeting = "中午好";
+            } else if (hour >= 14 && hour < 18) {
+                greeting = "下午好";
+            } else if (hour >= 18 && hour < 22) {
+                greeting = "晚上好";
+            } else {
+                greeting = "夜深了";
+            }
+            
+            document.getElementById('greeting').textContent = `${greeting}，选择你的收听时长，开启定制推荐`;
+            
+            // 更新时间显示
+            const timeStr = now.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('current-time').textContent = timeStr;
+            
+            // 每分钟更新一次
+            setTimeout(updateGreeting, 60000);
+        }
+        
+        // 滑块选择器功能
+        function initSlider() {
+            const slider = document.getElementById('listen-duration-slider');
+            const durationValue = document.getElementById('duration-value');
+            
+            // 初始化显示
+            durationValue.textContent = slider.value;
+            
+            // 关键节点值
+            const keyPoints = [0, 30, 60, 90, 120];
+            
+            // 监听滑块变化
+            slider.addEventListener('input', function() {
+                let value = parseInt(this.value);
+                durationValue.textContent = value;
+            });
+            
+            // 添加滑块释放事件，实现节点吸附功能
+            slider.addEventListener('change', function() {
+                let value = parseInt(this.value);
+                
+                // 查找最近的关键节点
+                let closest = keyPoints.reduce((prev, curr) => {
+                    return (Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev);
+                });
+                
+                // 如果当前值与关键节点的差距小于10，则吸附到关键节点
+                if (Math.abs(value - closest) <= 10) {
+                    this.value = closest;
+                    durationValue.textContent = closest;
+                }
+            });
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGreeting(); // 更新问候语
+            initSlider();     // 初始化滑块
+        });
+
+    </script>
+    <script>
+        const listenDurationSlider = document.getElementById('listen-duration-slider');
+        const durationValueSpan = document.getElementById('duration-value');
+        const recommendationResultUl = document.getElementById('recommendation-result').querySelector('ul');
+        const greetingElement = document.getElementById('greeting');
+        const currentTimeElement = document.getElementById('current-time');
+
+        // 示例播客数据 (实际应用中应从后端获取)
+        const allPodcasts = [
+            { id: 1, title: "科技早知道", duration: 15, cover: 'https://via.placeholder.com/60/8e44ad/ffffff?text=Tech', summary: '每日科技资讯解读' },
+            { id: 2, title: "商业就是这样", duration: 45, cover: 'https://via.placeholder.com/60/2ecc71/ffffff?text=Biz', summary: '深度商业案例分析' },
+            { id: 3, title: "环球故事会", duration: 70, cover: 'https://via.placeholder.com/60/3498db/ffffff?text=Story', summary: '世界各地的奇闻趣事' },
+            { id: 4, title: "轻松学英语", duration: 10, cover: 'https://via.placeholder.com/60/f1c40f/ffffff?text=Eng', summary: '日常英语口语练习' },
+            { id: 5, title: "历史的回声", duration: 90, cover: 'https://via.placeholder.com/60/e74c3c/ffffff?text=Hist', summary: '探寻历史的印记' },
+            { id: 6, title: "冥想与放松", duration: 25, cover: 'https://via.placeholder.com/60/1abc9c/ffffff?text=Calm', summary: '引导式冥想放松练习' },
+            { id: 7, title: "电影评论家", duration: 55, cover: 'https://via.placeholder.com/60/9b59b6/ffffff?text=Film', summary: '最新电影深度评论' },
+            { id: 8, title: "健康生活指南", duration: 35, cover: 'https://via.placeholder.com/60/27ae60/ffffff?text=Life', summary: '科学实用的健康建议' },
+            { id: 9, title: "音乐漫谈", duration: 80, cover: 'https://via.placeholder.com/60/d35400/ffffff?text=Music', summary: '不同风格音乐赏析' },
+            { id: 10, title: "睡前小故事", duration: 20, cover: 'https://via.placeholder.com/60/2c3e50/ffffff?text=Bed', summary: '温馨治愈的睡前故事' }
+        ];
+
+        // 更新滑块显示的值
+        listenDurationSlider.addEventListener('input', () => {
+            durationValueSpan.textContent = listenDurationSlider.value;
+        });
+
+        // 更新问候语和时间
+        function updateGreetingAndTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = "";
+            if (hours < 6) {
+                greeting = "凌晨好！";
+            } else if (hours < 12) {
+                greeting = "早上好！";
+            } else if (hours < 14) {
+                greeting = "中午好！";
+            } else if (hours < 18) {
+                greeting = "下午好！";
+            } else {
+                greeting = "晚上好！";
+            }
+            // 保留原有的问候语部分，只更新时间相关的提示
+            // greetingElement.textContent = `${greeting}选择你的收听时长，开启定制推荐`; 
+
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            currentTimeElement.textContent = `${hours}:${minutes}`;
+        }
+
+        // 生成播客列表项 HTML
+        function createPodcastListItem(podcast) {
+            return `
+                <li>
+                    <img src="${podcast.cover}" alt="${podcast.title}" class="podcast-thumbnail">
+                    <div class="podcast-info">
+                        <span class="podcast-title">${podcast.title}</span>
+                        <span class="podcast-duration">时长: ${podcast.duration}分钟</span>
+                        <p class="summary">${podcast.summary}</p>
+                    </div>
+                    <button class="secondary" onclick="playPodcast(${podcast.id})"><i class="fas fa-play"></i> 播放</button>
+                </li>
+            `;
+        }
+
+        // 获取推荐播客
+        function getRecommendations(isButtonClicked = false) {
+            let recommendedPodcasts = [];
+            const selectedDuration = parseInt(listenDurationSlider.value);
+
+            if (isButtonClicked) {
+                // 根据选择的时长推荐 (简单示例：时长接近的)
+                recommendedPodcasts = allPodcasts.filter(p => Math.abs(p.duration - selectedDuration) <= 15).slice(0, 3);
+                // 如果筛选后不够3个，可以补充一些其他的
+                if (recommendedPodcasts.length < 3) {
+                    const otherPodcasts = allPodcasts.filter(p => !recommendedPodcasts.some(rp => rp.id === p.id));
+                    recommendedPodcasts = recommendedPodcasts.concat(otherPodcasts.slice(0, 3 - recommendedPodcasts.length));
+                }
+                 console.log(`根据时长 ${selectedDuration} 分钟推荐`);
+            } else {
+                // 随机推荐3个 (初始加载)
+                const shuffled = [...allPodcasts].sort(() => 0.5 - Math.random());
+                recommendedPodcasts = shuffled.slice(0, 3);
+                console.log("初始随机推荐");
+            }
+
+            // 更新推荐列表
+            recommendationResultUl.innerHTML = recommendedPodcasts.map(createPodcastListItem).join('');
+        }
+
+        // 模拟播放功能
+        function playPodcast(id) {
+            const podcast = allPodcasts.find(p => p.id === id);
+            if (podcast) {
+                console.log(`开始播放: ${podcast.title}`);
+                // 更新播放器UI (这里只是示例)
+                document.querySelector('.player-title').textContent = podcast.title;
+                document.querySelector('.player-author').textContent = `时长: ${podcast.duration}分钟`; // 假设没有作者信息
+                document.querySelector('.podcast-cover').style.backgroundImage = `url('${podcast.cover}')`;
+                // 实际播放逻辑会更复杂
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateGreetingAndTime();
+            setInterval(updateGreetingAndTime, 60000); // 每分钟更新时间
+            getRecommendations(false); // 初始加载随机推荐
+        });
+
+    </script>
+</body>
+</html>

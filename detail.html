@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>播客详情</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --primary-light: #a569bd;
+            --background-color: #f5f5f7;
+            --surface-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #777777;
+            --border-color: #e0e0e0;
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: var(--surface-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(142, 68, 173, 0.1);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link i {
+            margin-right: 5px;
+        }
+        .podcast-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        .podcast-cover-large {
+            width: 150px;
+            height: 150px;
+            border-radius: var(--border-radius);
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .podcast-info-main {
+            flex-grow: 1;
+        }
+        .podcast-title-large {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+        .podcast-author-large {
+            font-size: 1.1rem;
+            color: var(--text-muted-color);
+            margin-bottom: 5px;
+        }
+        .podcast-duration-large {
+            font-size: 1rem;
+            color: var(--text-muted-color);
+        }
+        .shownotes {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+        .shownotes h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        /* 独立播放器样式 */
+        .audio-player {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            border-radius: var(--border-radius);
+            padding: 20px;
+            color: white;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.2);
+        }
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 8px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            color: white;
+            font-size: 0.9rem;
+        }
+        .control-button.play-pause {
+            width: 55px;
+            height: 55px;
+            font-size: 1.3rem;
+            background: white;
+            color: var(--primary-color);
+        }
+        .control-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .control-button.play-pause:hover {
+            background: white;
+        }
+        .progress-container {
+            margin-bottom: 5px;
+        }
+        .progress-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2.5px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress-fill {
+            position: absolute; 
+            left: 0; 
+            top: 0;
+            height: 100%;
+            background: white;
+            border-radius: 2.5px;
+            width: 0%;
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回首页</a>
+
+        <div class="podcast-header">
+            <img src="" alt="播客封面" class="podcast-cover-large" id="detail-cover">
+            <div class="podcast-info-main">
+                <h2 class="podcast-title-large" id="detail-title">加载中...</h2>
+                <p class="podcast-author-large" id="detail-author">...</p>
+                <p class="podcast-duration-large" id="detail-duration">...</p>
+            </div>
+        </div>
+
+        <div class="shownotes">
+            <h3>Shownotes</h3>
+            <p id="detail-shownotes">播客简介或 Shownotes 内容加载中...</p>
+        </div>
+
+        <div class="audio-player">
+            <audio id="audio-player-element"></audio>
+            <div class="player-controls">
+                <button class="control-button" id="rewind-button" title="后退15秒"><i class="fas fa-backward"></i></button>
+                <button class="control-button play-pause" id="play-pause-button" title="播放/暂停">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="control-button" id="forward-button" title="快进15秒"><i class="fas fa-forward"></i></button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="time-display">
+                    <span id="current-time-display">0:00</span>
+                    <span id="duration-display">0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟播客数据 (与 index.html 保持一致)
+        const allPodcasts = [
+             { id: 1, author:"李诞", title: "20.违心时刻", duration: 43, description: "你的关注", shownotes: "本期节目讨论了生活中的违心时刻及其影响。" },
+            { id: 2, author:"博物志", title: "235.扬州观想（上）", duration: 98, description: "你的关注", shownotes: "扬州的历史文化漫谈，上半部分。" },
+            { id: 3, author:"声动早咖啡", title: "情绪劳动成职场隐形KPI，打工人怎样才能减少内耗？", duration: 16, description: "今日更新", shownotes: "探讨职场中的情绪劳动问题。" },
+            { id: 4, author:"歪波音乐室", title: "4月新歌推荐 | 陶喆、黄宣、Lorde、打雷姐…初夏来临！", duration: 81, description: "你的关注", shownotes: "推荐四月份值得一听的新歌。" },
+            { id: 5, author:"张小珺", title: "对Manus创始人肖弘的3小时访谈：世界不是线性外推，做博弈中的重要变量", duration: 202, description: "近期热门", shownotes: "深度访谈Manus创始人肖弘。" },
+            { id: 6, author:"商业就是这样", title: "商业小样25 | 一次性搞懂AUDI和奥迪的关系", duration: 12, description: "今日更新", shownotes: "讲解奥迪品牌的历史和关系。" },
+            { id: 7, author:"奇想驿", title: "在flomo 5周年时，聊聊那些真实的思考痕迹", duration: 27, description: "你的关注", shownotes: "关于使用flomo记录思考的经验分享。" },
+            { id: 8, author:"随机波动", title: "【随机波动158】与严艺家聊《混沌少年时》：当男孩杀人，当师姐发疯", duration: 87, description: "近期热门", shownotes: "讨论书籍《混沌少年时》。" },
+            { id: 9, author:"天真不天真", title: "vol.26 我的新进化：在运动中找回生命主体性", duration: 68, description: "近期热门", shownotes: "分享通过运动找回自我主体性的经历。" },
+            { id: 10, author:"不把天聊si", title: "vol.197 | 逐渐变老的生活里，如何创造年轻感？", duration: 47, description: "今日更新", shownotes: "探讨如何在变老过程中保持年轻心态。" },
+            { id: 11, author:"喜番调频|笑个不停", title: "我的高光（中光、低光、微光）时刻", duration: 81, description: "笑话脱口秀", shownotes: "分享生活中的各种有趣时刻。" },
+            { id: 12, author:"给女孩的商业第一课", title: "【润宇返场】怒聊4小时！教会女孩如何启动小生意", duration: 179, description: "你的关注", shownotes: "面向女性创业者的商业启动指南。" },
+            { id: 13, author:"看理想圆桌", title: "观鸟做饭写日记，在一个不守承诺的世界自我托举", duration: 76, description: "你的关注", shownotes: "讨论如何在不确定的世界中寻找生活的乐趣。" },
+            { id: 14, author:"生活杂志", title: "腐竹，热量比猪大肠还高！很多人却还在把它当减脂餐", duration: 8, description: "生活杂谈", shownotes: "关于腐竹营养价值的科普。" },
+            { id: 15, author:"电影不无聊", title: "vol.501 2025年5月观影指南", duration: 73, description: "今日更新", shownotes: "推荐2025年5月值得观看的电影。" },
+            { id: 16, author:"行动派精选文章", title: "高配人生，不是“拼出来”的", duration: 12, description: "个人成长", shownotes: "探讨关于人生成功的不同观点。" },
+            { id: 17, author:"知行小酒馆", title: "E184 当关税站改变世界：我们要怎样理解未来的生活、投资以及经济秩序？", duration: 78, description: "近期热门", shownotes: "分析关税战对未来经济和生活的影响。" },
+            { id: 18, author:"原来是这样？！", title: "我们为什么会哺乳？", duration: 50, description: "科学通识", shownotes: "科普哺乳行为的生物学原理。" },
+            { id: 19, author:"地理狗看世界", title: "济州岛，苦尽甘柑来", duration: 9, description: "世界风情", shownotes: "介绍韩国济州岛的风土人情。" },
+            { id: 20, author:"文化有限", title: "夏洛的网：总会有人为你写下“你很棒”", duration: 96, description: "近期热门", shownotes: "解读经典儿童文学《夏洛的网》。" },
+            { id: 21, author:"36氪·8点1氪", title: "一季度全国黄金消费量290.492吨", duration: 3, description: "今日更新", shownotes: "播报近期黄金消费数据。" },
+            { id: 22, author:"商业就是这样", title: "vol.205 我们研究了奥乐齐中国所有的商品，它到底便宜吗", duration: 45, description: "你的关注", shownotes: "分析奥乐齐在中国的商品价格策略。" }
+        ];
+
+        const audio = document.getElementById('audio-player-element');
+        const playPauseButton = document.getElementById('play-pause-button');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const currentTimeDisplay = document.getElementById('current-time-display');
+        const durationDisplay = document.getElementById('duration-display');
+        const rewindButton = document.getElementById('rewind-button');
+        const forwardButton = document.getElementById('forward-button');
+
+        let currentPodcast = null;
+
+        // 获取播客封面图片路径 (与 index.html 保持一致)
+        function getPodcastCoverPath(author) {
+            const defaultCover = 'https://via.placeholder.com/150x150/8e44ad/ffffff?text=' + encodeURIComponent(author.charAt(0));
+            const authorImgMap = {
+                '李诞': 'image/李诞.jpg',
+                '声动早咖啡': 'image/声动早咖啡.jpg',
+                '商业就是这样': 'image/商业就是这样.jpg',
+                '天真不天真': 'image/天真不天真.jpg',
+                '生活杂志': 'image/生活杂志.jpg',
+                '原来是这样？！': 'image/原来是这样？！.jpg',
+                '地理狗看世界': 'image/地理狗看世界.jpg',
+                '文化有限': 'image/文化有限.jpg',
+                '知行小酒馆': 'image/知行小酒馆.jpg',
+                '36氪·8点1氪': 'image/8点1氪.jpg',
+                '不把天聊si': 'image/不把天聊si.jpg',
+                '奇想驿': 'image/奇想驿.jpg',
+                '张小珺': 'image/张小珺.jpg',
+                '故事FM': 'image/故事FM.jpg',
+                '电影不无聊': 'image/电影不无聊.jpg',
+                '随机波动': 'image/随机波动.jpg'
+                // ... 其他作者映射
+            };
+            return authorImgMap[author] || defaultCover;
+        }
+
+        // 格式化时间
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // 加载播客详情
+        function loadPodcastDetails(podcastId) {
+            currentPodcast = allPodcasts.find(p => p.id === podcastId);
+            if (!currentPodcast) {
+                console.error('未找到播客');
+                document.getElementById('detail-title').textContent = '播客未找到';
+                return;
+            }
+
+            document.getElementById('detail-title').textContent = currentPodcast.title;
+            document.getElementById('detail-author').textContent = currentPodcast.author;
+            document.getElementById('detail-duration').textContent = `时长: ${currentPodcast.duration} 分钟`;
+            document.getElementById('detail-cover').src = getPodcastCoverPath(currentPodcast.author);
+            document.getElementById('detail-cover').alt = currentPodcast.title;
+            document.getElementById('detail-shownotes').textContent = currentPodcast.shownotes || '暂无 Shownotes。';
+
+            // 设置音频源
+            audio.src = `audio/${currentPodcast.author}.mp3`; // 假设音频文件命名规则
+            // audio.load(); // 可以在这里预加载，或者等待用户点击播放
+        }
+
+        // 播放/暂停切换
+        function togglePlayPause() {
+            if (audio.paused || audio.ended) {
+                audio.play().catch(e => console.error("音频播放错误:", e));
+            } else {
+                audio.pause();
+            }
+        }
+
+        // 更新播放按钮状态
+        function updatePlayPauseIcon() {
+            const icon = playPauseButton.querySelector('i');
+            if (audio.paused || audio.ended) {
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+            } else {
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+            }
+        }
+
+        // 更新进度条和时间显示
+        function updateProgress() {
+            if (audio.duration) {
+                const progressPercent = (audio.currentTime / audio.duration) * 100;
+                progressFill.style.width = `${progressPercent}%`;
+                currentTimeDisplay.textContent = formatTime(audio.currentTime);
+                durationDisplay.textContent = formatTime(audio.duration);
+            } else {
+                 // 处理 duration 未加载的情况
+                 currentTimeDisplay.textContent = '0:00';
+                 durationDisplay.textContent = '0:00';
+                 progressFill.style.width = '0%';
+            }
+        }
+
+        // 设置播放进度
+        function setProgress(e) {
+            const width = progressBar.clientWidth;
+            const clickX = e.offsetX;
+            if (audio.duration) {
+                 audio.currentTime = (clickX / width) * audio.duration;
+            }
+        }
+        
+        // 快进/后退
+        function skipTime(seconds) {
+            audio.currentTime += seconds;
+        }
+
+        // --- 事件监听 ---
+        playPauseButton.addEventListener('click', togglePlayPause);
+        audio.addEventListener('play', updatePlayPauseIcon);
+        audio.addEventListener('pause', updatePlayPauseIcon);
+        audio.addEventListener('ended', updatePlayPauseIcon);
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('loadedmetadata', updateProgress); // 确保加载元数据后更新总时长
+        progressBar.addEventListener('click', setProgress);
+        rewindButton.addEventListener('click', () => skipTime(-15));
+        forwardButton.addEventListener('click', () => skipTime(15));
+
+        // 页面加载时获取 URL 参数并加载播客
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const podcastId = parseInt(urlParams.get('id'));
+
+            if (podcastId) {
+                loadPodcastDetails(podcastId);
+            } else {
+                console.error('未提供播客 ID');
+                document.getElementById('detail-title').textContent = '无效的播客 ID';
+            }
+        });
+    </script>
+</body>
+</html>
